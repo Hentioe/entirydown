@@ -1,7 +1,7 @@
-defmodule Entirydown.State do
+defmodule Entitydown.State do
   @moduledoc false
 
-  alias Entirydown.Entiry
+  alias Entitydown.Entity
 
   defmodule Line do
     @moduledoc false
@@ -19,11 +19,11 @@ defmodule Entirydown.State do
   @type t :: %__MODULE__{
           line: Line.t(),
           pos: non_neg_integer,
-          entiries: [Entiry.t()]
+          entiries: [Entity.t()]
         }
 
-  def add_entiry(state, entiry) do
-    entiries = state.entiries ++ [entiry]
+  def add_entity(state, entity) do
+    entiries = state.entiries ++ [entity]
 
     %{state | entiries: entiries}
   end

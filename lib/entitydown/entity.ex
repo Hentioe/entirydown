@@ -1,8 +1,8 @@
-defmodule Entirydown.Entiry do
+defmodule Entitydown.Entity do
   @moduledoc false
 
-  # 此处的 `entiry_type` 主要来自于 `https://core.telegram.org/bots/api#messageentity` 的 `type` 字段说明。
-  @type entiry_type ::
+  # 此处的 `entity_type` 主要来自于 `https://core.telegram.org/bots/api#messageentity` 的 `type` 字段说明。
+  @type entity_type ::
           :bold
           | :italic
           | :underline
@@ -15,7 +15,7 @@ defmodule Entirydown.Entiry do
   defstruct [:type, :offset, :length, :content, :url, :language]
 
   @type t :: %__MODULE__{
-          type: entiry_type,
+          type: entity_type,
           offset: non_neg_integer,
           length: non_neg_integer,
           content: binary | nil,

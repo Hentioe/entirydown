@@ -1,7 +1,7 @@
-defmodule Entirydown.TextLinkRule do
+defmodule Entitydown.TextLinkRule do
   @moduledoc false
 
-  use Entirydown.Rule
+  use Entitydown.Rule
 
   @spec match(State.t()) :: {:match, State.t()} | {:nomatch, State.t()}
   def match(state) do
@@ -21,14 +21,14 @@ defmodule Entirydown.TextLinkRule do
           |> Enum.slice((cs_pos + 2)..(cs_pos + 2 + cp_pos - 1))
           |> Enum.join()
 
-        entiry = %Entiry{
+        entity = %Entity{
           type: :text_link,
           content: text,
           url: url
         }
 
         # 后面继续 +1 是因为 `chars` 不包含起始字符
-        state = state |> add_entiry(entiry) |> update_pos(cs_pos + 2 + cp_pos + 1 + 1)
+        state = state |> add_entity(entity) |> update_pos(cs_pos + 2 + cp_pos + 1 + 1)
 
         {:match, state}
       else

@@ -1,10 +1,10 @@
-defmodule Entirydown.TextLinkRuleTest do
+defmodule Entitydown.TextLinkRuleTest do
   use ExUnit.Case
-  doctest Entirydown
+  doctest Entitydown
 
-  alias Entirydown.State
+  alias Entitydown.State
 
-  import Entirydown.TextLinkRule
+  import Entitydown.TextLinkRule
 
   test "match/1" do
     state = %State{
@@ -32,7 +32,7 @@ defmodule Entirydown.TextLinkRuleTest do
     assert state.pos == String.length(src)
 
     assert state.entiries == [
-             %Entirydown.Entiry{
+             %Entitydown.Entity{
                type: :text_link,
                content: "我是链接文本][]]]]",
                url: "我是链接地址"
@@ -54,7 +54,7 @@ defmodule Entirydown.TextLinkRuleTest do
     assert state.pos == String.length(src)
 
     assert state.entiries == [
-             %Entirydown.Entiry{
+             %Entitydown.Entity{
                type: :text_link,
                content: "我是链接文本][]]]]\\()",
                url: "我是链接地址\\)"
@@ -76,7 +76,7 @@ defmodule Entirydown.TextLinkRuleTest do
     assert state.pos == String.length(src)
 
     assert state.entiries == [
-             %Entirydown.Entiry{
+             %Entitydown.Entity{
                type: :text_link,
                content: "Telegram 的主页",
                url: "https://t.me/"

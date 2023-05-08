@@ -1,18 +1,18 @@
-defmodule Entirydown.Rule do
+defmodule Entitydown.Rule do
   @moduledoc false
 
   defmacro __using__(_) do
     quote do
-      alias Entirydown.State
-      alias Entirydown.Entiry
+      alias Entitydown.State
+      alias Entitydown.Entity
 
-      import Entirydown.State
-      import Entirydown.Rule
+      import Entitydown.State
+      import Entitydown.Rule
     end
   end
 
   @doc ~S"""
-  iex> Entirydown.Rule.escapes_char?("\\")
+  iex> Entitydown.Rule.escapes_char?("\\")
   true
   """
   @spec escapes_char?(String.t()) :: boolean()
