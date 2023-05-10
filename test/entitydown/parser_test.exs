@@ -11,8 +11,8 @@ defmodule Entitydown.ParserTest do
   """
 
   test "parse/1" do
-    state = parse(@markdown)
+    nodes = parse(@markdown)
 
-    assert length(state.entities) == 34
+    assert length(nodes) == 34
   end
 end

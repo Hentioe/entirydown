@@ -1,19 +1,25 @@
 defmodule Entitydown.Parser do
   @moduledoc false
 
-  alias Entitydown.{State, TextLinkRule}
+  alias Entitydown.{Entity, State, TextLinkRule}
   alias Entitydown.State.Line
 
-  @spec parse(String.t()) :: State.t()
+  @spec parse(String.t()) :: [Entity.t()]
   def parse(text) do
-    text
-    |> String.split("\n")
-    |> Enum.map(&Line.new/1)
-    |> Enum.reduce(%State{}, fn line, state ->
-      parse_node(%{state | line: line, pos: 0})
-    end)
+    state =
+      text
+      |> String.split("\n")
+      |> Enum.map(&Line.new/1)
+      |> Enum.reduce(%State{}, fn line, state ->
+        parse_node(%{state | line: line, pos: 0})
+      end)
+
+    state.entities
   end
 
+  @spec parse_node(State.t()) :: State.t()
+
+  # 处理行结束
   def parse_node(%{line: %{len: len}, pos: pos} = state) when len < pos + 1 do
     State.add_line_break(state)
   end
