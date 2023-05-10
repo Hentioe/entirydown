@@ -1,3 +1,3 @@
-# Entirydown
+# Entitydown
 
 WIP
