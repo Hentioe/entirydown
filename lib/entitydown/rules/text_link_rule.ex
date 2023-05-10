@@ -59,9 +59,11 @@ defmodule Entitydown.TextLinkRule do
     case find_r do
       {"]", i} ->
         next_char = Enum.at(chars, start_pos + i + 1)
+        pos = i + start_pos
 
-        if next_char == "(" do
-          {:ok, i + start_pos}
+        # pos > 0 是为了防止空值
+        if pos > 0 && next_char == "(" do
+          {:ok, pos}
         else
           _find_close_square_pos(chars, len, start_pos + i + 1)
         end
@@ -90,11 +92,13 @@ defmodule Entitydown.TextLinkRule do
     case find_r do
       {")", i} ->
         prev_char = Enum.at(chars, start_pos + i - 1)
+        pos = i + start_pos
 
-        if escapes_char?(prev_char) do
-          _find_close_parentheses(chars, len, start_pos + i + 1)
+        # pos > 0 是为了防止空值
+        if pos > 0 && !escapes_char?(prev_char) do
+          {:ok, pos}
         else
-          {:ok, i + start_pos}
+          _find_close_parentheses(chars, len, start_pos + i + 1)
         end
 
       _ ->

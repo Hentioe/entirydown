@@ -83,4 +83,30 @@ defmodule Entitydown.TextLinkRuleTest do
              }
            ]
   end
+
+  test "match empty" do
+    src = "[]()"
+
+    state = %State{
+      line: %State.Line{
+        src: src,
+        len: String.length(src)
+      },
+      pos: 0
+    }
+
+    assert match?({:nomatch, _}, match(state))
+
+    src = "[我是链接文本]()"
+
+    state = %State{
+      line: %State.Line{
+        src: src,
+        len: String.length(src)
+      },
+      pos: 0
+    }
+
+    assert match?({:nomatch, _}, match(state))
+  end
 end
