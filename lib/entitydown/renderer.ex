@@ -3,7 +3,7 @@ defmodule Entitydown.Renderer do
 
   alias Entitydown.Entity
 
-  @spec render(Entity.t()) :: {String.t(), [Entity.t()]}
+  @spec render([Entity.t()]) :: {String.t(), [Entity.t()]}
   def render(nodes) do
     Enum.reduce(nodes, {"", []}, fn node, {text, entities} ->
       render_node(node, text, entities)
