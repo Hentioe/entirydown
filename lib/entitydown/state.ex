@@ -12,20 +12,39 @@ defmodule Entitydown.State do
             src: binary,
             len: non_neg_integer
           }
+
+    def new(src) do
+      %__MODULE__{
+        src: src,
+        len: String.length(src)
+      }
+    end
   end
 
-  defstruct [:line, :pos, entiries: []]
+  defstruct [:line, :pos, entities: []]
 
   @type t :: %__MODULE__{
           line: Line.t(),
           pos: non_neg_integer,
-          entiries: [Entity.t()]
+          entities: [Entity.t()]
         }
 
   def add_entity(state, entity) do
-    entiries = state.entiries ++ [entity]
+    entities = state.entities ++ [entity]
 
-    %{state | entiries: entiries}
+    %{state | entities: entities}
+  end
+
+  def read_normal_char(state) do
+    entities = state.entities ++ [%Entity{content: String.slice(state.line.src, state.pos, 1)}]
+
+    %{state | entities: entities, pos: state.pos + 1}
+  end
+
+  def add_line_break(state) do
+    entities = state.entities ++ [%Entity{content: "\n"}]
+
+    %{state | entities: entities, pos: state.pos + 1}
   end
 
   def update_pos(state, pos) do

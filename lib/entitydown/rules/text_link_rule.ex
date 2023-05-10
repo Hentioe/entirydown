@@ -28,7 +28,7 @@ defmodule Entitydown.TextLinkRule do
         }
 
         # 后面继续 +1 是因为 `chars` 不包含起始字符
-        state = state |> add_entity(entity) |> update_pos(cs_pos + 2 + cp_pos + 1 + 1)
+        state = state |> add_entity(entity) |> update_pos(pos + cs_pos + 2 + cp_pos + 1 + 1)
 
         {:match, state}
       else

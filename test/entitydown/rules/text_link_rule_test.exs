@@ -31,7 +31,7 @@ defmodule Entitydown.TextLinkRuleTest do
 
     assert state.pos == String.length(src)
 
-    assert state.entiries == [
+    assert state.entities == [
              %Entitydown.Entity{
                type: :text_link,
                content: "我是链接文本][]]]]",
@@ -53,7 +53,7 @@ defmodule Entitydown.TextLinkRuleTest do
 
     assert state.pos == String.length(src)
 
-    assert state.entiries == [
+    assert state.entities == [
              %Entitydown.Entity{
                type: :text_link,
                content: "我是链接文本][]]]]\\()",
@@ -75,7 +75,7 @@ defmodule Entitydown.TextLinkRuleTest do
 
     assert state.pos == String.length(src)
 
-    assert state.entiries == [
+    assert state.entities == [
              %Entitydown.Entity{
                type: :text_link,
                content: "Telegram 的主页",
