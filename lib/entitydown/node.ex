@@ -5,6 +5,12 @@ defmodule Entitydown.Node do
 
   @type node_type ::
           :bold
+          | :italic
+          | :underline
+          | :strikethrough
+          | :spoiler
+          | :code
+          | :pre
           | :text_link
 
   @type t :: %__MODULE__{
