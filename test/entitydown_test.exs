@@ -7,12 +7,16 @@ defmodule EntitydownTest do
   test "nested" do
     markdown = """
     [*_~我是加粗的斜体链接文字~_*](https://t.me/)
+    `[我是链接文本](我是链接地址)`
+    [`我是链接文本`](我是链接地址)
     """
 
     {text, entities} = extract(markdown)
 
     assert text == """
            我是加粗的斜体链接文字
+           [我是链接文本](我是链接地址)
+           `我是链接文本`
 
            """
 
@@ -37,6 +41,17 @@ defmodule EntitydownTest do
                type: :strikethrough,
                offset: 0,
                length: 11
+             },
+             %Entitydown.Entity{
+               type: :code,
+               offset: 12,
+               length: 16
+             },
+             %Entitydown.Entity{
+               type: :text_link,
+               offset: 29,
+               length: 8,
+               url: "我是链接地址"
              }
            ]
   end

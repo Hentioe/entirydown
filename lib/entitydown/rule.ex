@@ -11,7 +11,16 @@ defmodule Entitydown.Rule do
     end
   end
 
-  defmacro __using__(signal_marker: mark, node_type: node_type) do
+  defmacro __using__([{:signal_marker, mark}, {:node_type, node_type} | opts]) do
+    children_exclude = Keyword.get(opts, :children_exclude, [])
+
+    rules =
+      if rules = Keyword.get(opts, :children_rules) do
+        rules
+      else
+        quote do: Parser.rules() -- [__MODULE__ | unquote(children_exclude)]
+      end
+
     quote do
       alias Entitydown.State
       alias Entitydown.Node
@@ -37,7 +46,7 @@ defmodule Entitydown.Rule do
               children =
                 Parser.parse_node(
                   %State{line: State.Line.new(text), pos: 0},
-                  Parser.rules() -- [__MODULE__],
+                  unquote(rules),
                   true
                 ).nodes
 

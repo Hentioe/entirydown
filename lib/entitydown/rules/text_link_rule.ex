@@ -3,7 +3,9 @@ defmodule Entitydown.TextLinkRule do
 
   use Entitydown.Rule
 
-  alias Entitydown.{Parser, State}
+  alias Entitydown.{Parser, State, CodeRule}
+
+  @children_exclude [CodeRule]
 
   @spec match(State.t()) :: {:match, State.t()} | {:nomatch, State.t()}
   def match(state) do
@@ -26,7 +28,7 @@ defmodule Entitydown.TextLinkRule do
         children =
           Parser.parse_node(
             %State{line: State.Line.new(text), pos: 0},
-            Parser.rules() -- [__MODULE__],
+            Parser.rules() -- [__MODULE__ | @children_exclude],
             true
           ).nodes
 
