@@ -1,14 +1,17 @@
 defmodule Entitydown.Parser do
   @moduledoc false
 
-  alias Entitydown.{Node, State, TextLinkRule, BoldRule, ItalicRule}
+  alias Entitydown.{Node, State, TextLinkRule, BoldRule, ItalicRule, StrikethroughRule}
   alias Entitydown.State.Line
 
   @rules [
     TextLinkRule,
     BoldRule,
-    ItalicRule
+    ItalicRule,
+    StrikethroughRule
   ]
+
+  def rules, do: @rules
 
   @spec parse(String.t()) :: [Node.t()]
   def parse(text) do

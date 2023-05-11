@@ -3,7 +3,7 @@ defmodule Entitydown.TextLinkRule do
 
   use Entitydown.Rule
 
-  alias Entitydown.{Parser, State, BoldRule, ItalicRule}
+  alias Entitydown.{Parser, State}
 
   @spec match(State.t()) :: {:match, State.t()} | {:nomatch, State.t()}
   def match(state) do
@@ -11,7 +11,7 @@ defmodule Entitydown.TextLinkRule do
 
     prev_char = String.at(src, pos - 1)
 
-    if String.at(src, pos) == "[" && !escapes_char?(prev_char) do
+    if String.at(src, pos) == "[" && !escapes?(prev_char) do
       chars = String.graphemes(String.slice(src, pos + 1, len))
 
       with {:ok, cs_pos} <- find_close_square_pos(chars),
@@ -26,7 +26,7 @@ defmodule Entitydown.TextLinkRule do
         children =
           Parser.parse_node(
             %State{line: State.Line.new(text), pos: 0},
-            [BoldRule, ItalicRule],
+            Parser.rules() -- [__MODULE__],
             true
           ).nodes
 
@@ -104,7 +104,7 @@ defmodule Entitydown.TextLinkRule do
         pos = i + start_pos
 
         # pos > 0 是为了防止空值
-        if pos > 0 && !escapes_char?(prev_char) do
+        if pos > 0 && !escapes?(prev_char) do
           {:ok, pos}
         else
           _find_close_parentheses(chars, len, start_pos + i + 1)

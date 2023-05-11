@@ -6,13 +6,13 @@ defmodule EntitydownTest do
 
   test "nested" do
     markdown = """
-    [*_我是加粗链接文字_*](https://t.me/)
+    [*_~我是加粗的斜体链接文字~_*](https://t.me/)
     """
 
     {text, entities} = extract(markdown)
 
     assert text == """
-           我是加粗链接文字
+           我是加粗的斜体链接文字
 
            """
 
@@ -20,18 +20,23 @@ defmodule EntitydownTest do
              %Entitydown.Entity{
                type: :text_link,
                offset: 0,
-               length: 8,
+               length: 11,
                url: "https://t.me/"
              },
              %Entitydown.Entity{
                type: :bold,
                offset: 0,
-               length: 8
+               length: 11
              },
              %Entitydown.Entity{
                type: :italic,
                offset: 0,
-               length: 8
+               length: 11
+             },
+             %Entitydown.Entity{
+               type: :strikethrough,
+               offset: 0,
+               length: 11
              }
            ]
   end
