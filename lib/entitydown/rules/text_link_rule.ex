@@ -3,6 +3,8 @@ defmodule Entitydown.TextLinkRule do
 
   use Entitydown.Rule
 
+  alias Entitydown.{Parser, State, BoldRule, ItalicRule}
+
   @spec match(State.t()) :: {:match, State.t()} | {:nomatch, State.t()}
   def match(state) do
     %{line: %{src: src, len: len}, pos: pos} = state
@@ -21,9 +23,16 @@ defmodule Entitydown.TextLinkRule do
           |> Enum.slice((cs_pos + 2)..(cs_pos + 2 + cp_pos - 1))
           |> Enum.join()
 
+        children =
+          Parser.parse_node(
+            %State{line: State.Line.new(text), pos: 0},
+            [BoldRule, ItalicRule],
+            true
+          ).nodes
+
         node = %Node{
           type: :text_link,
-          children: text,
+          children: children,
           url: url
         }
 

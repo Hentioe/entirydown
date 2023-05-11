@@ -17,7 +17,7 @@ defmodule Entitydown.ParserTest do
   test "parse/1" do
     nodes = parse(@markdown)
 
-    assert length(nodes) == 36
+    assert length(nodes) == 11
 
     text_link_nodes = Enum.filter(nodes, &(&1.type == :text_link))
 
@@ -25,13 +25,13 @@ defmodule Entitydown.ParserTest do
 
     assert Enum.at(text_link_nodes, 0) == %Node{
              type: :text_link,
-             children: "Google 官网",
+             children: [%Node{children: "Google 官网"}],
              url: "https://www.google.com/"
            }
 
     assert Enum.at(text_link_nodes, 1) == %Node{
              type: :text_link,
-             children: "这里",
+             children: [%Node{children: "这里"}],
              url: "https://t.me/"
            }
 
@@ -41,12 +41,12 @@ defmodule Entitydown.ParserTest do
 
     assert Enum.at(bold_nodes, 0) == %Node{
              type: :bold,
-             children: "我是一段加粗文字"
+             children: [%Node{children: "我是一段加粗文字"}]
            }
 
     assert Enum.at(bold_nodes, 1) == %Node{
              type: :bold,
-             children: "你叫什么名字？"
+             children: [%Node{children: "你叫什么名字？"}]
            }
   end
 end

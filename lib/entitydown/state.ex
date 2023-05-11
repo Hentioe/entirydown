@@ -36,7 +36,25 @@ defmodule Entitydown.State do
   end
 
   def read_normal_char(state) do
-    nodes = state.nodes ++ [%Node{children: String.slice(state.line.src, state.pos, 1)}]
+    r =
+      case List.last(state.nodes) do
+        %{type: nil} = node ->
+          children = node.children <> String.slice(state.line.src, state.pos, 1)
+
+          {:updated, %{node | children: children}}
+
+        _node ->
+          {:added, %Node{type: nil, children: String.slice(state.line.src, state.pos, 1)}}
+      end
+
+    nodes =
+      case r do
+        {:updated, node} ->
+          List.update_at(state.nodes, -1, fn _node -> node end)
+
+        {:added, node} ->
+          state.nodes ++ [node]
+      end
 
     %{state | nodes: nodes, pos: state.pos + 1}
   end

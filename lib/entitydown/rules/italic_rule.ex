@@ -1,9 +1,9 @@
-defmodule Entitydown.BoldRule do
+defmodule Entitydown.ItalicRule do
   @moduledoc false
 
   use Entitydown.Rule
 
-  alias Entitydown.{Parser, TextLinkRule, ItalicRule}
+  alias Entitydown.{Parser, TextLinkRule, BoldRule}
 
   @spec match(State.t()) :: {:match, State.t()} | {:nomatch, State.t()}
   def match(state) do
@@ -11,7 +11,7 @@ defmodule Entitydown.BoldRule do
 
     prev_char = String.at(src, pos - 1)
 
-    if String.at(src, pos) == "*" && !escapes_char?(prev_char) do
+    if String.at(src, pos) == "_" && !escapes_char?(prev_char) do
       chars = String.graphemes(String.slice(src, pos + 1, len))
 
       case find_end_asterisk_pos(chars) do
@@ -21,12 +21,12 @@ defmodule Entitydown.BoldRule do
           children =
             Parser.parse_node(
               %State{line: State.Line.new(text), pos: 0},
-              [TextLinkRule, ItalicRule],
+              [TextLinkRule, BoldRule],
               true
             ).nodes
 
           node = %Node{
-            type: :bold,
+            type: :italic,
             children: children
           }
 
@@ -56,11 +56,11 @@ defmodule Entitydown.BoldRule do
       Enum.slice(chars, start_pos..-1)
       |> Enum.with_index()
       |> Enum.find(fn {char, _i} ->
-        char == "*"
+        char == "_"
       end)
 
     case find_r do
-      {"*", i} ->
+      {"_", i} ->
         prev_char = Enum.at(chars, start_pos + i - 1)
         pos = i + start_pos
 

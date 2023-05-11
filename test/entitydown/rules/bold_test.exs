@@ -34,7 +34,7 @@ defmodule Entitydown.BoldTest do
     assert state.nodes == [
              %Node{
                type: :bold,
-               children: "欢迎光临"
+               children: [%Node{children: "欢迎光临"}]
              }
            ]
 
@@ -55,7 +55,7 @@ defmodule Entitydown.BoldTest do
     assert state.nodes == [
              %Node{
                type: :bold,
-               children: "*欢迎光临\\*"
+               children: [%Node{children: "*欢迎光临\\*"}]
              }
            ]
   end

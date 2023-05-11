@@ -34,7 +34,7 @@ defmodule Entitydown.TextLinkRuleTest do
     assert state.nodes == [
              %Node{
                type: :text_link,
-               children: "我是链接文本][]]]]",
+               children: [%Node{children: "我是链接文本][]]]]"}],
                url: "我是链接地址"
              }
            ]
@@ -56,7 +56,7 @@ defmodule Entitydown.TextLinkRuleTest do
     assert state.nodes == [
              %Node{
                type: :text_link,
-               children: "我是链接文本][]]]]\\()",
+               children: [%Node{children: "我是链接文本][]]]]\\()"}],
                url: "我是链接地址\\)"
              }
            ]
@@ -78,7 +78,7 @@ defmodule Entitydown.TextLinkRuleTest do
     assert state.nodes == [
              %Node{
                type: :text_link,
-               children: "Telegram 的主页",
+               children: [%Node{children: "Telegram 的主页"}],
                url: "https://t.me/"
              }
            ]
