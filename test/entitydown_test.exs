@@ -4,11 +4,13 @@ defmodule EntitydownTest do
 
   import Entitydown
 
-  test "nested" do
+  test "nested combination" do
     markdown = """
-    [*_~我是加粗的斜体链接文字~_*](https://t.me/)
+    [*_我是加粗的斜体链接文字_*](https://t.me/)
     `[我是链接文本](我是链接地址)`
     [`我是链接文本`](我是链接地址)
+    [_*~我是一个斜体并加粗和删除后的链接文本~*_](https://t.me/)
+    ~我是删除线，_我在删除的同时倾斜*加粗*_我又正了~
     """
 
     {text, entities} = extract(markdown)
@@ -17,6 +19,8 @@ defmodule EntitydownTest do
            我是加粗的斜体链接文字
            [我是链接文本](我是链接地址)
            `我是链接文本`
+           我是一个斜体并加粗和删除后的链接文本
+           我是删除线，我在删除的同时倾斜加粗我又正了
 
            """
 
@@ -38,11 +42,6 @@ defmodule EntitydownTest do
                length: 11
              },
              %Entitydown.Entity{
-               type: :strikethrough,
-               offset: 0,
-               length: 11
-             },
-             %Entitydown.Entity{
                type: :code,
                offset: 12,
                length: 16
@@ -52,6 +51,42 @@ defmodule EntitydownTest do
                offset: 29,
                length: 8,
                url: "我是链接地址"
+             },
+             %Entitydown.Entity{
+               type: :text_link,
+               offset: 38,
+               length: 18,
+               url: "https://t.me/"
+             },
+             %Entitydown.Entity{
+               type: :italic,
+               offset: 38,
+               length: 18
+             },
+             %Entitydown.Entity{
+               type: :bold,
+               offset: 38,
+               length: 18
+             },
+             %Entitydown.Entity{
+               type: :strikethrough,
+               offset: 38,
+               length: 18
+             },
+             %Entitydown.Entity{
+               type: :strikethrough,
+               offset: 57,
+               length: 21
+             },
+             %Entitydown.Entity{
+               type: :italic,
+               offset: 63,
+               length: 11
+             },
+             %Entitydown.Entity{
+               type: :bold,
+               offset: 72,
+               length: 2
              }
            ]
   end

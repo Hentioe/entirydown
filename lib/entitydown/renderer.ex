@@ -12,14 +12,14 @@ defmodule Entitydown.Renderer do
 
   @spec render_node(Node.t(), String.t(), [Entity.t()], integer) :: {String.t(), [Entity.t()]}
 
-  # 渲染普通字符
+  # 渲染文本节点
   def render_node(%{type: nil, children: children}, text, entities, _offset) do
     text = text <> children
 
     {text, entities}
   end
 
-  # 渲染并添加文本链接实体
+  # 渲染并添加文本实体
   def render_node(%{type: type, children: children} = node, text, entities, offset)
       when is_binary(children) do
     length = String.length(children)
@@ -41,14 +41,12 @@ defmodule Entitydown.Renderer do
     {text, entities}
   end
 
-  # 渲染并添加文本链接实体
+  # 渲染并添加实体
   def render_node(%{type: type, children: children} = node, text, entities, offset)
       when is_list(children) do
-    children_offset = String.length(text)
-    # 因为 `children_offset` 等同于 `text` 长度，所以直接与 `children_offset` 相加
-    offset = offset + children_offset
+    offset = offset + String.length(text)
 
-    {children_text, children_entities} = flatten_children(children, children_offset)
+    {children_text, children_entities} = flatten_children(children, offset)
 
     length = String.length(children_text)
 
