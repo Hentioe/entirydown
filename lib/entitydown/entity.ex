@@ -12,13 +12,12 @@ defmodule Entitydown.Entity do
           | :pre
           | :text_link
 
-  defstruct [:type, :offset, :length, :content, :url, :language]
+  defstruct [:type, :offset, :length, :url, :language]
 
   @type t :: %__MODULE__{
           type: entity_type,
           offset: non_neg_integer,
           length: non_neg_integer,
-          content: binary | nil,
           url: binary | nil,
           language: binary | nil
         }
