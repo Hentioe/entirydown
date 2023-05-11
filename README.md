@@ -4,7 +4,7 @@ Extract plain text and markup entities from Markdown text.
 
 ## Usage
 
-```iex
+```elixir
 iex> Entitydown.extract "Hello, click [here](https://t.me) to visit the Telegram official website."  
 {"Hello, click here to visit the Telegram official website.\n",
  [
@@ -19,6 +19,6 @@ iex> Entitydown.extract "Hello, click [here](https://t.me) to visit the Telegram
  ]}
 ```
 
-Its main purpose is to replace Telegram's support for Markdown because it lacks security (which can easily lead to message sending failures). This library converts Markdown text to secure entity parameters to avoid this issue.
+Its main purpose is to replace Telegram's support for Markdown because it lacks security (**which can easily lead to message sending failures**). This library converts Markdown text to secure entity parameters to avoid this issue.
 
 This library is still under development and its support for Markdown is **not yet comprehensive**.
