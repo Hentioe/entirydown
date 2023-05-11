@@ -21,14 +21,14 @@ defmodule Entitydown.TextLinkRule do
           |> Enum.slice((cs_pos + 2)..(cs_pos + 2 + cp_pos - 1))
           |> Enum.join()
 
-        entity = %Entity{
+        node = %Node{
           type: :text_link,
-          content: text,
+          children: text,
           url: url
         }
 
         # 后面继续 +1 是因为 `chars` 不包含起始字符
-        state = state |> add_entity(entity) |> update_pos(pos + cs_pos + 2 + cp_pos + 1 + 1)
+        state = state |> add_node(node) |> update_pos(pos + cs_pos + 2 + cp_pos + 1 + 1)
 
         {:match, state}
       else

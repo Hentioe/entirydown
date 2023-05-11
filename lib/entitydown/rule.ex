@@ -4,7 +4,7 @@ defmodule Entitydown.Rule do
   defmacro __using__(_) do
     quote do
       alias Entitydown.State
-      alias Entitydown.Entity
+      alias Entitydown.Node
 
       import Entitydown.State
       import Entitydown.Rule

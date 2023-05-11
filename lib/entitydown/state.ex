@@ -1,7 +1,7 @@
 defmodule Entitydown.State do
   @moduledoc false
 
-  alias Entitydown.Entity
+  alias Entitydown.Node
 
   defmodule Line do
     @moduledoc false
@@ -21,30 +21,30 @@ defmodule Entitydown.State do
     end
   end
 
-  defstruct [:line, :pos, entities: []]
+  defstruct [:line, :pos, nodes: []]
 
   @type t :: %__MODULE__{
           line: Line.t(),
           pos: non_neg_integer,
-          entities: [Entity.t()]
+          nodes: [Node.t()]
         }
 
-  def add_entity(state, entity) do
-    entities = state.entities ++ [entity]
+  def add_node(state, node) do
+    nodes = state.nodes ++ [node]
 
-    %{state | entities: entities}
+    %{state | nodes: nodes}
   end
 
   def read_normal_char(state) do
-    entities = state.entities ++ [%Entity{content: String.slice(state.line.src, state.pos, 1)}]
+    nodes = state.nodes ++ [%Node{children: String.slice(state.line.src, state.pos, 1)}]
 
-    %{state | entities: entities, pos: state.pos + 1}
+    %{state | nodes: nodes, pos: state.pos + 1}
   end
 
   def add_line_break(state) do
-    entities = state.entities ++ [%Entity{content: "\n"}]
+    nodes = state.nodes ++ [%Node{children: "\n"}]
 
-    %{state | entities: entities, pos: state.pos + 1}
+    %{state | nodes: nodes, pos: state.pos + 1}
   end
 
   def update_pos(state, pos) do
