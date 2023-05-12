@@ -34,14 +34,19 @@ defmodule Entitydown.Rule do
       def match(state) do
         %{line: %{src: src, len: len}, pos: pos} = state
 
-        prev_char = String.at(src, pos - 1)
+        prev_escapes? =
+          if pos > 0 do
+            src |> String.at(pos - 1) |> escapes?()
+          else
+            false
+          end
 
-        if String.at(src, pos) == unquote(mark) && !escapes?(prev_char) do
+        if String.at(src, pos) == unquote(mark) && !prev_escapes? do
           chars = String.graphemes(String.slice(src, pos + 1, len))
 
-          case find_end_asterisk_pos(chars) do
-            {:ok, ea_pos} ->
-              text = chars |> Enum.slice(0..(ea_pos - 1)) |> Enum.join()
+          case loop(chars, 0, :text, 0) do
+            {:ok, {chars, epos, deleted}} ->
+              text = chars |> Enum.slice(0..(epos - 1)) |> Enum.join()
 
               children =
                 Parser.parse_node(
@@ -55,8 +60,12 @@ defmodule Entitydown.Rule do
                 children: children
               }
 
-              # 后面继续 +1 是因为 `chars` 不包含起始字符
-              state = state |> add_node(node) |> update_pos(pos + ea_pos + 1 + 1)
+              state =
+                state
+                |> add_node(node)
+                # +1: 跳过了前面一个字符
+                # +1: 跳下一个将要匹配的字符
+                |> update_pos(pos + 1 + epos + deleted + 1)
 
               {:match, state}
 
@@ -68,37 +77,29 @@ defmodule Entitydown.Rule do
         end
       end
 
-      defp find_end_asterisk_pos(chars) do
-        _find_end_asterisk_pos(chars, length(chars), 0)
-      end
+      defp loop(chars, i, :text, deleted) do
+        ch = Enum.at(chars, i)
 
-      defp _find_end_asterisk_pos(_chars, len, start_pos) when len == start_pos do
-        :none
-      end
-
-      defp _find_end_asterisk_pos(chars, len, start_pos) do
-        find_r =
-          Enum.slice(chars, start_pos..-1)
-          |> Enum.with_index()
-          |> Enum.find(fn {char, _i} ->
-            char == unquote(mark)
-          end)
-
-        case find_r do
-          {unquote(mark), i} ->
-            prev_char = Enum.at(chars, start_pos + i - 1)
-            pos = i + start_pos
-
-            # pos > 0 是为了防止空值
-            if pos > 0 && !escapes?(prev_char) do
-              {:ok, pos}
-            else
-              _find_end_asterisk_pos(chars, len, start_pos + i + 1)
-            end
-
-          _ ->
+        cond do
+          ch == nil ->
             :none
+
+          [ch, Enum.at(chars, i + 1)] == ["\\", unquote(mark)] ->
+            # 删除转义字符后，下标已经减去一（原本应该 +2），组合 `children` 文本时无需再修正下标。
+            # loop(List.delete_at(chars, i), i + 1, :text, deleted + 1)
+
+            loop(chars, i + 2, :text, deleted)
+
+          ch == unquote(mark) && i > 0 ->
+            loop(chars, i, :ended, deleted)
+
+          true ->
+            loop(chars, i + 1, :text, deleted)
         end
+      end
+
+      defp loop(chars, i, :ended, deleted) do
+        {:ok, {chars, i, deleted}}
       end
     end
   end
