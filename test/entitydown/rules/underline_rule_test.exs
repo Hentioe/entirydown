@@ -28,7 +28,7 @@ defmodule Entitydown.UnderlineRuleTest do
     assert state.nodes == [
              %Node{
                type: :underline,
-               children: [%Node{children: "欢迎\\__光临\\_\\_"}]
+               children: [%Node{children: "欢迎__光临__"}]
              }
            ]
   end

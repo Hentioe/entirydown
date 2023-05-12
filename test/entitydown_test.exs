@@ -102,4 +102,34 @@ defmodule EntitydownTest do
              }
            ]
   end
+
+  test "escapes" do
+    markdown = """
+    __欢迎\\__光临\\_\\___
+    *\\~欢迎光临\\~*
+    \\`欢迎光临`
+    """
+
+    {text, entities} = extract(markdown)
+
+    assert text == """
+           欢迎__光临__
+           ~欢迎光临~
+           `欢迎光临`
+
+           """
+
+    assert entities == [
+             %Entitydown.Entity{
+               type: :underline,
+               offset: 0,
+               length: 8
+             },
+             %Entitydown.Entity{
+               type: :bold,
+               offset: 9,
+               length: 6
+             }
+           ]
+  end
 end

@@ -55,7 +55,7 @@ defmodule Entitydown.CodeRuleTest do
     assert state.nodes == [
              %Node{
                type: :code,
-               children: [%Node{children: "`欢迎光临\\`"}]
+               children: [%Node{children: "`欢迎光临`"}]
              }
            ]
   end
