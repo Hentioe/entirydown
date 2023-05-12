@@ -11,109 +11,109 @@ defmodule Entitydown.TextLinkRule do
   def match(state) do
     %{line: %{src: src, len: len}, pos: pos} = state
 
-    prev_char = String.at(src, pos - 1)
-
-    if String.at(src, pos) == "[" && !escapes?(prev_char) do
-      chars = String.graphemes(String.slice(src, pos + 1, len))
-
-      with {:ok, cs_pos} <- find_close_square_pos(chars),
-           {:ok, cp_pos} <- find_close_parentheses(Enum.slice(chars, (cs_pos + 2)..-1)) do
-        text = chars |> Enum.slice(0..(cs_pos - 1)) |> Enum.join()
-
-        url =
-          chars
-          |> Enum.slice((cs_pos + 2)..(cs_pos + 2 + cp_pos - 1))
-          |> Enum.join()
-
-        children =
-          Parser.parse_node(
-            %State{line: State.Line.new(text), pos: 0},
-            Parser.rules() -- [__MODULE__ | @children_exclude],
-            true
-          ).nodes
-
-        node = %Node{
-          type: :text_link,
-          children: children,
-          url: url
-        }
-
-        # 后面继续 +1 是因为 `chars` 不包含起始字符
-        state = state |> add_node(node) |> update_pos(pos + cs_pos + 2 + cp_pos + 1 + 1)
-
-        {:match, state}
+    prev_escapes? =
+      if pos > 0 do
+        src |> String.at(pos - 1) |> escapes?()
       else
-        :none ->
-          {:nomatch, state}
+        false
       end
-    else
-      {:nomatch, state}
-    end
-  end
 
-  defp find_close_square_pos(chars) do
-    _find_close_square_pos(chars, length(chars), 0)
-  end
+    start_matched? = String.at(src, pos) == "["
 
-  defp _find_close_square_pos(_chars, len, start_pos) when len == start_pos do
-    :none
-  end
+    cond do
+      !prev_escapes? && start_matched? ->
+        chars = String.graphemes(String.slice(src, pos + 1, len))
 
-  defp _find_close_square_pos(chars, len, start_pos) do
-    find_r =
-      Enum.slice(chars, start_pos..-1)
-      |> Enum.with_index()
-      |> Enum.find(fn {char, _i} ->
-        char == "]"
-      end)
+        with {:ok, {chars, espos, deleted}} <- find_end_square(chars, 0, :text, 0),
+             {:ok, {chars, eepos, deleted}} <-
+               find_end_parentheses(chars, 0, :url, deleted, espos + 2) do
+          text = chars |> Enum.slice(0..(espos - 1)) |> Enum.join()
+          url = chars |> Enum.slice((espos + 2)..(eepos - 1 + espos + 2)) |> Enum.join()
 
-    case find_r do
-      {"]", i} ->
-        next_char = Enum.at(chars, start_pos + i + 1)
-        pos = i + start_pos
+          children =
+            Parser.parse_node(
+              %State{line: State.Line.new(text), pos: 0},
+              Parser.rules() -- [__MODULE__ | @children_exclude],
+              true
+            ).nodes
 
-        # pos > 0 是为了防止空值
-        if pos > 0 && next_char == "(" do
-          {:ok, pos}
+          node = %Node{
+            type: :text_link,
+            children: children,
+            url: url
+          }
+
+          state =
+            state
+            |> add_node(node)
+            # espos + 2: 文本内容到 url 首字符长度，因为 eepos 不包含这个长度
+            |> update_pos(pos + 1 + eepos + deleted + 1 + espos + 2)
+
+          {:match, state}
         else
-          _find_close_square_pos(chars, len, start_pos + i + 1)
+          :none ->
+            {:nomatch, state}
         end
 
-      _ ->
-        :none
+      prev_escapes? && start_matched? ->
+        state = remove_prev(state)
+
+        {:nomatch, state}
+
+      true ->
+        {:nomatch, state}
     end
   end
 
-  def find_close_parentheses(chars) do
-    _find_close_parentheses(chars, length(chars), 0)
-  end
+  defp find_end_square(chars, i, :text, deleted) do
+    ch = Enum.at(chars, i)
 
-  defp _find_close_parentheses(_chars, len, start_pos) when len == start_pos do
-    :none
-  end
-
-  defp _find_close_parentheses(chars, len, start_pos) do
-    find_r =
-      Enum.slice(chars, start_pos..-1)
-      |> Enum.with_index()
-      |> Enum.find(fn {char, _i} ->
-        char == ")"
-      end)
-
-    case find_r do
-      {")", i} ->
-        prev_char = Enum.at(chars, start_pos + i - 1)
-        pos = i + start_pos
-
-        # pos > 0 是为了防止空值
-        if pos > 0 && !escapes?(prev_char) do
-          {:ok, pos}
-        else
-          _find_close_parentheses(chars, len, start_pos + i + 1)
-        end
-
-      _ ->
+    cond do
+      ch == nil ->
         :none
+
+      ch == "\\" && Enum.at(chars, i + 1) in ["[", "]", "(", ")"] ->
+        # 删除转义字符后，下标已经减去一（原本应该 +2），组合 `children` 文本时无需再修正下标。
+        find_end_square(List.delete_at(chars, i), i + 1, :text, deleted + 1)
+
+      ch == "]" && Enum.at(chars, i + 1) == "(" && i > 0 ->
+        find_end_square(chars, i, :ended, deleted)
+
+      true ->
+        find_end_square(chars, i + 1, :text, deleted)
     end
+  end
+
+  defp find_end_square(chars, i, :ended, deleted) do
+    {:ok, {chars, i, deleted}}
+  end
+
+  defp find_end_parentheses(chars, i, :url, deleted, start_pos) do
+    ch = Enum.at(chars, start_pos + i)
+
+    cond do
+      ch == nil ->
+        :none
+
+      ch == "\\" && Enum.at(chars, start_pos + i + 1) in ["(", ")"] ->
+        # 删除转义字符后，下标已经减去一（原本应该 +2），组合 `children` 文本时无需再修正下标。
+        find_end_parentheses(
+          List.delete_at(chars, start_pos + i),
+          i + 1,
+          :url,
+          deleted + 1,
+          start_pos
+        )
+
+      ch == ")" && i > 0 ->
+        find_end_parentheses(chars, i, :ended, deleted, start_pos)
+
+      true ->
+        find_end_parentheses(chars, i + 1, :url, deleted, start_pos)
+    end
+  end
+
+  defp find_end_parentheses(chars, i, :ended, deleted, _start_pos) do
+    {:ok, {chars, i, deleted}}
   end
 end

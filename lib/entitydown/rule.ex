@@ -77,21 +77,9 @@ defmodule Entitydown.Rule do
             end
 
           prev_escapes? && start_matched? ->
-            # 此处处理未匹配上，因为左边存在转义字符的情况。
-            # 删除原始 `src` 当前座标的前一个转义字符
-            # 删除最后一个节点 `children` 字符串的尾部转义字符（因为此时未匹配的文本已被追加到 `children` 中作为普通字符串）
-            # 更新状态中新的 `line` 和节点列表，并偏移坐标（回溯 1 个坐标）
+            state = remove_prev(state)
 
-            chars = String.graphemes(String.slice(src, 0, len))
-            nsrc = chars |> List.delete_at(pos - 1) |> Enum.join()
-
-            if last_node = List.last(state.nodes) do
-              last_node = %{last_node | children: String.slice(last_node.children, 0..-2)}
-
-              nodes = List.update_at(state.nodes, -1, fn _node -> last_node end)
-
-              {:nomatch, %{state | line: State.Line.new(nsrc), pos: pos - 1, nodes: nodes}}
-            end
+            {:nomatch, state}
 
           true ->
             {:nomatch, state}
@@ -120,6 +108,26 @@ defmodule Entitydown.Rule do
       defp loop(chars, i, :ended, deleted) do
         {:ok, {chars, i, deleted}}
       end
+    end
+  end
+
+  def remove_prev(%{line: %{len: len, src: src}, pos: pos} = state) do
+    # 此处处理未匹配上，因为左边存在转义字符的情况。
+    # 删除原始 `src` 当前座标的前一个转义字符
+    # 删除最后一个节点 `children` 字符串的尾部转义字符（因为此时未匹配的文本已被追加到 `children` 中作为普通字符串）
+    # 更新状态中新的 `line` 和节点列表，并偏移坐标（回溯 1 个坐标）
+
+    chars = String.graphemes(String.slice(src, 0, len))
+    nsrc = chars |> List.delete_at(pos - 1) |> Enum.join()
+
+    if last_node = List.last(state.nodes) do
+      last_node = %{last_node | children: String.slice(last_node.children, 0..-2)}
+
+      nodes = List.update_at(state.nodes, -1, fn _node -> last_node end)
+
+      %{state | line: Entitydown.State.Line.new(nsrc), pos: pos - 1, nodes: nodes}
+    else
+      state
     end
   end
 

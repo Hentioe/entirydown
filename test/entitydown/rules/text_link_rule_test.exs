@@ -42,10 +42,7 @@ defmodule Entitydown.TextLinkRuleTest do
     src = "[我是链接文本][]]]]\\()](我是链接地址\\))"
 
     state = %State{
-      line: %State.Line{
-        src: src,
-        len: String.length(src)
-      },
+      line: State.Line.new(src),
       pos: 0
     }
 
@@ -56,8 +53,8 @@ defmodule Entitydown.TextLinkRuleTest do
     assert state.nodes == [
              %Node{
                type: :text_link,
-               children: [%Node{children: "我是链接文本][]]]]\\()"}],
-               url: "我是链接地址\\)"
+               children: [%Node{children: "我是链接文本][]]]]()"}],
+               url: "我是链接地址)"
              }
            ]
 

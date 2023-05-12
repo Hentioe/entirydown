@@ -108,6 +108,8 @@ defmodule EntitydownTest do
     __欢迎\\__光临\\_\\___
     *\\~欢迎光临\\~*
     \\`欢迎光临`
+    [我是链接文本]\\(](我是链接地址)
+    \\[我是链接文本](我是链接地址)
     """
 
     {text, entities} = extract(markdown)
@@ -116,6 +118,8 @@ defmodule EntitydownTest do
            欢迎__光临__
            ~欢迎光临~
            `欢迎光临`
+           我是链接文本](
+           [我是链接文本](我是链接地址)
 
            """
 
@@ -129,6 +133,12 @@ defmodule EntitydownTest do
                type: :bold,
                offset: 9,
                length: 6
+             },
+             %Entitydown.Entity{
+               type: :text_link,
+               offset: 23,
+               length: 8,
+               url: "我是链接地址"
              }
            ]
   end
