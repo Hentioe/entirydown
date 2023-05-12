@@ -4,5 +4,5 @@ defmodule Entitydown.ItalicRule do
   use Entitydown.Rule,
     signal_marker: "_",
     node_type: :italic,
-    children_exclude: [Entitydown.CodeRule]
+    children_exclude: [Entitydown.CodeRule, Entitydown.UnderlineRule]
 end

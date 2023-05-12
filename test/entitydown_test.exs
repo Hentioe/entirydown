@@ -11,6 +11,7 @@ defmodule EntitydownTest do
     [`我是链接文本`](我是链接地址)
     [_*~我是一个斜体并加粗和删除后的链接文本~*_](https://t.me/)
     ~我是删除线，_我在删除的同时倾斜*加粗*_我又正了~
+    __我是_斜体部分_的下划线__
     """
 
     {text, entities} = extract(markdown)
@@ -21,6 +22,7 @@ defmodule EntitydownTest do
            `我是链接文本`
            我是一个斜体并加粗和删除后的链接文本
            我是删除线，我在删除的同时倾斜加粗我又正了
+           我是斜体部分的下划线
 
            """
 
@@ -87,6 +89,16 @@ defmodule EntitydownTest do
                type: :bold,
                offset: 72,
                length: 2
+             },
+             %Entitydown.Entity{
+               type: :underline,
+               offset: 79,
+               length: 10
+             },
+             %Entitydown.Entity{
+               type: :italic,
+               offset: 81,
+               length: 4
              }
            ]
   end

@@ -1,11 +1,22 @@
 defmodule Entitydown.Parser do
   @moduledoc false
 
-  alias Entitydown.{Node, State, CodeRule, TextLinkRule, BoldRule, ItalicRule, StrikethroughRule}
+  alias Entitydown.{
+    Node,
+    State,
+    CodeRule,
+    UnderlineRule,
+    TextLinkRule,
+    BoldRule,
+    ItalicRule,
+    StrikethroughRule
+  }
+
   alias Entitydown.State.Line
 
   @rules [
     CodeRule,
+    UnderlineRule,
     TextLinkRule,
     BoldRule,
     ItalicRule,
